@@ -1,0 +1,11 @@
+../xprintf/src/xprintf.c:38:12:ilog10	24	static
+../xprintf/src/xprintf.c:60:15:i10x	24	static
+../xprintf/src/xprintf.c:82:13:ftoa	88	static
+../xprintf/src/xprintf.c:159:6:xputc	16	static
+../xprintf/src/xprintf.c:167:6:xfputc	16	static
+../xprintf/src/xprintf.c:187:6:xputs	16	static
+../xprintf/src/xprintf.c:195:6:xfputs	16	static
+../xprintf/src/xprintf.c:232:13:xvfprintf	104	static
+../xprintf/src/xprintf.c:370:6:xprintf	16	static
+../xprintf/src/xprintf.c:384:6:xfprintf	28	static
+../xprintf/src/xprintf.c:399:6:xsprintf	28	static

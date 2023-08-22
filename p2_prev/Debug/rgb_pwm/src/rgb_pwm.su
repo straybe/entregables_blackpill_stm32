@@ -1,0 +1,3 @@
+../rgb_pwm/src/rgb_pwm.c:10:6:rgb_pwm_star	8	static
+../rgb_pwm/src/rgb_pwm.c:16:6:rgb_pwm_stop	8	static
+../rgb_pwm/src/rgb_pwm.c:22:6:rgb_pwm_update	24	static

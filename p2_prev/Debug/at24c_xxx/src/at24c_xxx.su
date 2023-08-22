@@ -1,0 +1,4 @@
+../at24c_xxx/src/at24c_xxx.c:11:6:at24c_write_byte	32	static
+../at24c_xxx/src/at24c_xxx.c:22:6:at24c_read_byte	32	static
+../at24c_xxx/src/at24c_xxx.c:34:16:at24c_write_word	32	static
+../at24c_xxx/src/at24c_xxx.c:57:16:at24c_read_word	40	static
