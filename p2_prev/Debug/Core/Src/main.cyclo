@@ -1,0 +1,10 @@
+main.c:94:5:main	5
+main.c:189:6:SystemClock_Config	3
+main.c:227:6:write_nibble	1
+main.c:241:6:kbd_get_print_key	10
+main.c:283:6:tone	1
+main.c:300:6:HAL_TIM_PeriodElapsedCallback	2
+main.c:306:6:get_passwords	2
+main.c:315:6:insert_password	3
+main.c:337:6:show_passwords	3
+main.c:351:6:Error_Handler	1

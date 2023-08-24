@@ -32,6 +32,8 @@ typedef union{
 void at24c_write_byte(uint8_t device_addr, uint16_t memory_addr, uint8_t data);
 void at24c_read_byte(uint8_t device_addr, uint16_t memory_addr, uint8_t *data_rcv);
 
+at24c_status_t at24c_write_4_bytes(uint8_t device_addr, uint16_t memory_addr, uint8_t *data);
+
 at24c_status_t at24c_write_word(uint8_t device_addr, uint16_t memory_addr, uint32_t data);
 at24c_status_t at24c_read_word(uint8_t device_addr, uint16_t memory_addr, uint32_t *data_rcv);
 

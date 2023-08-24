@@ -1,6 +1,6 @@
 xprintf/src/edx_xprintf.o: ../xprintf/src/edx_xprintf.c \
- C:/Users/Daniel\ Meneses/Documents/Curso\ ARM/Programas/Practicas/p2_prev/xprintf/inc/edx_xprintf.h \
- C:/Users/Daniel\ Meneses/Documents/Curso\ ARM/Programas/Practicas/p2_prev/xprintf/inc/xprintf.h \
+ D:/Programming/Microcontroladores/p2_prev/xprintf/inc/edx_xprintf.h \
+ D:/Programming/Microcontroladores/p2_prev/xprintf/inc/xprintf.h \
  ../Core/Inc/usart.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
@@ -32,8 +32,8 @@ xprintf/src/edx_xprintf.o: ../xprintf/src/edx_xprintf.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-C:/Users/Daniel\ Meneses/Documents/Curso\ ARM/Programas/Practicas/p2_prev/xprintf/inc/edx_xprintf.h:
-C:/Users/Daniel\ Meneses/Documents/Curso\ ARM/Programas/Practicas/p2_prev/xprintf/inc/xprintf.h:
+D:/Programming/Microcontroladores/p2_prev/xprintf/inc/edx_xprintf.h:
+D:/Programming/Microcontroladores/p2_prev/xprintf/inc/xprintf.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:

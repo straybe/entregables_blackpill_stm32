@@ -47,12 +47,14 @@
 #define BUZZER_HANDLER 	&htim3
 #define F_CPU 			16000000
 #define PRESCALER		2
+#define DEFAULT_VALUE_MEMORI 0xFFFFFFFF
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
 rgb_color_t led_color;
+at24_mem_addr_t at24_addr;
 volatile uint32_t tim_counter;
 uint8_t kbd, alarm_case;
 char tx_buffer[200];
@@ -62,6 +64,10 @@ uint8_t kbd_keys[4][4] = {
 		{'0', '8', '5', '2'},
 		{'*', '7', '4', '1'}
 };
+
+uint32_t password;
+uint8_t mem_addr[5] = {0x00, 0x04, 0x08, 0x0C, 0x10};
+uint32_t passwords[5];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,6 +76,13 @@ void SystemClock_Config(void);
 void write_nibble(uint8_t dato);
 void tone(uint32_t freq, uint32_t time);
 void kbd_get_print_key(uint8_t *kbd_key);
+
+void get_passwords(at24_mem_addr_t at24_addr, uint8_t *mem_addr, uint32_t *passwords);
+void insert_password(uint8_t *kbd, uint32_t *password);
+void show_passwords(uint8_t mem_addr[], uint32_t passwords[]);
+void delete_password(uint8_t *kbd, uint8_t mem_addr[], uint32_t passwords[]);
+uint8_t password_exist(uint32_t password, uint32_t passwords[]);
+void save_password();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -123,13 +136,14 @@ int main(void)
   led_color.colors.blue = 10;
   rgb_pwm_update(&led_color);
 
-
   xprint_clear();
   xprintf("Cerradura electronica\n\r\n\r\n\r");
   xprintf("A. Digitar password\n\r");
   xprintf("B. Agregar password\n\r");
   xprintf("C. Borrar password\n\r");
   xprintf("D. Ver lista de password\n\r");
+
+  get_passwords(at24_addr, mem_addr, passwords);
 
   while (1)
   {
@@ -142,15 +156,29 @@ int main(void)
 	  alarm_case = kbd;
 	  switch(alarm_case){
 		  case 'A': //Insertar password
+			  insert_password(&kbd, &password);
+			  if (password_exist(password, passwords) == 1) {
+				  xprintf("Este password ya existe\n\r");
+			  }
+			  else {
+				  save_password();
+			  }
+			  xprintf("Password: %c", password);
 			  break;
 
 		  case 'B': //Agregar password
+			  insert_password(&kbd, &password);
+			  xprintf("Password: %c", password);
 			  break;
 
 		  case 'C': //Borrar password
+			  show_passwords(mem_addr, passwords);
+			  delete_password(&kbd, mem_addr, passwords);
 			  break;
 
 		  case 'D': //Ver password
+			  xprintf("Passwords guardadas:\n\r");
+			  show_passwords(mem_addr, passwords);
 			  break;
 
 		  default:
@@ -219,7 +247,6 @@ void write_nibble(uint8_t dato){
 	HAL_GPIO_WritePin(KBD_OUT1_GPIO_Port, KBD_OUT1_Pin, (GPIO_PinState)(bit1));
 	HAL_GPIO_WritePin(KBD_OUT2_GPIO_Port, KBD_OUT2_Pin, (GPIO_PinState)(bit2));
 	HAL_GPIO_WritePin(KBD_OUT3_GPIO_Port, KBD_OUT3_Pin, (GPIO_PinState)(bit3));
-
 }
 
 void kbd_get_print_key(uint8_t *kbd_key){
@@ -263,6 +290,7 @@ void kbd_get_print_key(uint8_t *kbd_key){
 
 	*kbd_key = kbd_data;
 }
+
 void tone(uint32_t freq, uint32_t time){
 	uint32_t arr_value = 0, aux1, aux2;
 
@@ -285,6 +313,82 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		HAL_GPIO_TogglePin(BUZZER_GPIO_Port, BUZZER_Pin);
 	}
 }
+
+void get_passwords(at24_mem_addr_t at24_addr, uint8_t *mem_addr, uint32_t *passwords){
+	at24_addr.partition_addr.page_addr = 0x00;
+
+	for(uint8_t i = 0; i < 5; i++){
+		at24_addr.partition_addr.byte_addr = mem_addr[i];
+		at24c_read_word(AT24C_ADDR, at24_addr.full_addr, &passwords[i]);
+	}
+}
+
+void insert_password(uint8_t *kbd, uint32_t *password){
+	uint8_t i = 0;
+	uint8_t input[4];
+	*password = 0;
+	*kbd = 0;
+
+	xprint_clear();
+	xprintf("Ingrese el valor del password:\n\r");
+
+	while(i < 4){
+		kbd_get_print_key(kbd);
+		HAL_Delay(20);
+
+		if (*kbd != 0) {
+			input[i] = *kbd;
+			i++;
+		}
+	}
+	*password = ((input[0] << 24) & (0xFF<<24)) + ((input[1] << 16) & (0xFF<<16)) +
+			  ((input[2] << 8) & (0xFF<<8)) + (input[3] & 0xFF);
+}
+
+void show_passwords(uint8_t mem_addr[5], uint32_t passwords[5]){
+	for(uint8_t i = 0; i < 5; i++){
+		if (passwords[i] != 0xFFFFFFFF) {
+			xprintf("%d.- DIR: 0X00%02X \t Password: %u \n\r", (i+1), mem_addr[i], passwords[i]);
+		}
+	}
+}
+
+void delete_password(uint8_t *kbd, uint8_t mem_addr[], uint32_t passwords[]){
+	at24_mem_addr_t at24_addr;
+	at24c_status_t status;
+
+	while(*kbd < 49 && *kbd > 53){
+		kbd_get_print_key(kbd);
+		HAL_Delay(20);
+	}
+
+	at24_addr.partition_addr.page_addr = 0x00;
+	at24_addr.partition_addr.byte_addr = mem_addr[*kbd];
+
+	passwords[*kbd] = 0xFFFFFFFF;
+	status = at24c_write_word(AT24C_ADDR, at24_addr.full_addr, passwords[*kbd]);
+
+	if (status == AT24_OPERATION_OK) {
+		xprintf("El password fue borrado satisfactoriamente\n\r");
+	}
+
+	(status == AT24_OPERATION_OK) ? xprintf("El password fue borrado satisfactoriamente\n\r") :
+			xprintf("Error al borrar el password\n\r");
+}
+
+uint8_t password_exist(uint32_t password, uint32_t passwords[]){
+	for(uint8_t i = 0; i < 5; i++){
+		if (passwords[i] == password) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void save_password(){
+
+}
+
 /* USER CODE END 4 */
 
 /**

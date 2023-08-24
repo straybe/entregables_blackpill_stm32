@@ -22,9 +22,9 @@ void rgb_pwm_stop(void){
 void rgb_pwm_update(rgb_color_t *rgb_color){
 	uint8_t r,g,b;
 
-	r = (uint8_t)(rgb_color->colors.red);
-	g = (uint8_t)(rgb_color->colors.green);
-	b = (uint8_t)(rgb_color->colors.blue);
+	r = (uint8_t)(255 - rgb_color->colors.red);
+	g = (uint8_t)(255 - rgb_color->colors.green);
+	b = (uint8_t)(255 - rgb_color->colors.blue);
 	__HAL_TIM_SET_COMPARE(RGB_HANDLER, TIM_CHANNEL_RED, r);
 	__HAL_TIM_SET_COMPARE(RGB_HANDLER, TIM_CHANNEL_GREEN, g);
 	__HAL_TIM_SET_COMPARE(RGB_HANDLER, TIM_CHANNEL_BLUE, b);

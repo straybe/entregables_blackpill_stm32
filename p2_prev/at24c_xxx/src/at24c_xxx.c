@@ -31,6 +31,7 @@ void at24c_read_byte(uint8_t device_addr, uint16_t memory_addr, uint8_t *data_rc
 	HAL_I2C_Master_Receive(&hi2c1, device_addr, &rcv_aux, 1, 200);
 	*data_rcv = rcv_aux;
 }
+
 at24c_status_t at24c_write_word(uint8_t device_addr, uint16_t memory_addr, uint32_t data){
 	uint8_t aux[6];
 	HAL_StatusTypeDef ref_status;
