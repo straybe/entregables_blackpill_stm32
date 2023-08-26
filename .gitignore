@@ -1,0 +1,51 @@
+# STM32 Cube IDE project files
+/.metadata/
+/.cproject
+/.project
+/.settings/
+
+# Compiled files
+/Debug/
+/Release/
+
+# Generated files
+/Drivers/STM32Fxxx_HAL_Driver/Inc/Legacy/
+/Drivers/STM32Fxxx_HAL_Driver/Src/Legacy/
+/Middlewares/Third_Party/
+/*.launch
+/*.cproject
+
+# IDE files
+/.settings/
+
+# User-specific IDE settings (optional)
+/.idea/
+/.vscode/
+
+# Build output
+/build/
+
+# Binary files and executables
+*.bin
+*.elf
+*.hex
+
+# Log and temporary files
+*.log
+*.swp
+*.swo
+*.pyc
+*.pyo
+*.tmp
+
+# Dependency folders
+/Utilities/
+
+# System Volume Information (Windows)
+/System\ Volume\ Information/
+
+# macOS folder attributes
+/.DS_Store
+
+# Compiled Python files
+__pycache__/
