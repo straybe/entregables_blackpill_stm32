@@ -47,7 +47,7 @@
 #define BUZZER_HANDLER 	&htim3
 #define F_CPU 			16000000
 #define PRESCALER		2
-#define DEFAULT_VALUE_MEMORI 0xFFFFFFFF
+#define DEFAULT_VALUE_MEMORY 0xFFFFFFFF
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -139,7 +139,6 @@ int main(void)
   led_color.colors.green = 10;
   led_color.colors.blue = 10;
   rgb_pwm_update(&led_color);
-  HAL_Delay(2000);
 
   show_menu();
 
@@ -301,8 +300,8 @@ void tone(uint32_t freq, uint32_t time){
 
 	HAL_TIM_Base_Stop_IT(BUZZER_HANDLER);
 
-	__HAL_TIM_SET_COUNTER(&htim2, 0);
-	__HAL_TIM_SET_AUTORELOAD(&htim2, arr_value);
+	__HAL_TIM_SET_COUNTER(BUZZER_HANDLER, 0);
+	__HAL_TIM_SET_AUTORELOAD(BUZZER_HANDLER, arr_value);
 	HAL_TIM_Base_Start_IT(BUZZER_HANDLER);
 
 	HAL_Delay(time);
@@ -370,15 +369,15 @@ void check_password(uint32_t password, uint32_t passwords[], rgb_color_t *led_co
 		led_color->colors.blue = 0;
 
 		rgb_pwm_update(led_color);
-		HAL_Delay(2000);
+		HAL_GPIO_WritePin(EN_SIGNAL_GPIO_Port, EN_SIGNAL_Pin, 0b0001);
+		tone(4000, 1000);
 
 		led_color->colors.red = 100;
 		led_color->colors.green = 10;
 		led_color->colors.blue = 10;
 
 		rgb_pwm_update(led_color);
-//		tone(4000, 1000);
-//		Checar el problema del buzzer
+		HAL_GPIO_WritePin(EN_SIGNAL_GPIO_Port, EN_SIGNAL_Pin, 0b0000);
 
 		xprintf("\n\rAcceso correcto\n\r");
 	}
@@ -392,7 +391,7 @@ void show_passwords(uint8_t mem_addr[], uint32_t passwords[]){
 	xprintf("\n\r");
 
 	for(uint8_t i = 0; i < 5; i++){
-		if (passwords[i] != 0xFFFFFFFF) {
+		if (passwords[i] != DEFAULT_VALUE_MEMORY) {
 			uint8_t aux0 = (passwords[i] >> 24) & 0xFF;
 			uint8_t aux1 = (passwords[i] >> 16) & 0xFF;
 			uint8_t aux2 = (passwords[i] >> 8) & 0xFF;
@@ -406,22 +405,27 @@ void delete_password(uint8_t kbd, uint8_t mem_addr[], uint32_t passwords[]){
 	at24_mem_addr_t at24_addr;
 	at24c_status_t status;
 	kbd = 0;
+	xprintf("\n\rIngrese un valor disponible mostrado o presione * para cancelar:\n\r");
 
 	while(!kbd){
 		kbd_get_print_key(&kbd);
 		HAL_Delay(20);
 	}
 
+	if(kbd == 42){
+		return;
+	}
+
 	kbd -= '1';
 
-	if (((kbd < 0)||(kbd > 4)) || (passwords[kbd] == 0xFFFFFFFF)) {
+	if (((kbd < 0)||(kbd > 4)) || (passwords[kbd] == DEFAULT_VALUE_MEMORY)) {
 		xprintf("\n\rIngrese un valor disponible mostrado:\n\r");
 		delete_password(kbd, mem_addr, passwords);
 	}
 	else{
 		at24_addr.partition_addr.page_addr = 0x00;
 		at24_addr.partition_addr.byte_addr = mem_addr[kbd];
-		passwords[kbd] = 0xFFFFFFFF;
+		passwords[kbd] = DEFAULT_VALUE_MEMORY;
 		status = at24c_write_word(AT24C_ADDR, at24_addr.full_addr, passwords[kbd]);
 
 		(status == AT24_OPERATION_OK) ? xprintf("\n\rEl password fue borrado satisfactoriamente\n\r") :
@@ -443,7 +447,7 @@ int8_t position_empty(uint8_t mem_addr[], uint32_t passwords[], at24_mem_addr_t 
 
 	for(int8_t i = 0; i < 5; i++){
 		at24_addr->partition_addr.byte_addr = mem_addr[i];
-		if (passwords[i] == 0xFFFFFFFF) {
+		if (passwords[i] == DEFAULT_VALUE_MEMORY) {
 			return i;
 		}
 	}
